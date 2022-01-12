@@ -1,0 +1,43 @@
+# based on https://github.com/tomchen/example-typescript-package/blob/main/.github/workflows/publish.yml
+
+name: Release & Publish
+
+# trigger on pushed commits with tags which are 'v'-prefixed, semver valid versions
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  build_publish_release:
+    name: publish to npm & create github release
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+          registry-url: 'https://registry.npmjs.org'
+      - name: install dependencies
+        run: npm install
+      - name: build
+        run: npm run build
+      - name: setup for github release
+        run: npm run setup_for_gh_release
+      - name: create github release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          name: ${{ github.ref }}
+          files: gh_release/*
+      - name: publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # TODO do github packages too?
+
+

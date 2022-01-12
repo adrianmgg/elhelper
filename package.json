@@ -19,7 +19,8 @@
         "build:esm": "tsc -p tsconfig_esm.json",
         "build:umd": "tsc -p tsconfig_umd.json",
         "build:types": "tsc -p tsconfig_types.json",
-        "build": "npm run build:cjs && npm run build:esm && npm run build:umd && npm run build:types"
+        "build": "npm run build:cjs && npm run build:esm && npm run build:umd && npm run build:types",
+        "setup_for_gh_release": "node scripts/setup_for_gh_release.mjs"
     },
     "main": "dist/cjs/elhelper.js",
     "module": "dist/esm/elhelper.js",
