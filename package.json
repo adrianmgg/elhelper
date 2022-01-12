@@ -1,0 +1,32 @@
+{
+    "name": "@amgg/elhelper",
+    "version": "2.0.0",
+    "description": "",
+    "author": "amgg",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/adrianmgg/elhelper.git"
+    },
+    "private": false,
+    "publishConfig": {
+        "access": "public"
+    },
+    "devDependencies": {
+        "typescript": "^4.5.4"
+    },
+    "scripts": {
+        "build:cjs": "tsc -p tsconfig_cjs.json",
+        "build:esm": "tsc -p tsconfig_esm.json",
+        "build:umd": "tsc -p tsconfig_umd.json",
+        "build:types": "tsc -p tsconfig_types.json",
+        "build": "npm run build:cjs && npm run build:esm && npm run build:umd && npm run build:types"
+    },
+    "main": "dist/cjs/elhelper.js",
+    "module": "dist/esm/elhelper.js",
+    "umd:main": "dist/umd/elhelper.js",
+    "types": "dist/types/elhelper.d.ts",
+    "files": [
+        "dist",
+        "src"
+    ]
+}
