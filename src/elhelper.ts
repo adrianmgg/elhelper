@@ -6,17 +6,17 @@ type ExcludeReadonlyPropKeys<T> = { [K in keyof T]: TypeEquals<Pick<T, K>, Reado
 type ExcludeReadonlyProps<T> = Pick<T, ExcludeReadonlyPropKeys<T>>;
 
 type ExcludeFunctionPropKeys<T> = { [K in keyof T]: T[K] extends (...args: any) => any ? never : K }[keyof T];
-type ExlcudeFunctionProps<T> = Pick<T, ExcludeFunctionPropKeys<T>>;
+type ExcludeFunctionProps<T> = Pick<T, ExcludeFunctionPropKeys<T>>;
 
 
 type SetupOptionsEventHelper<OurElemType extends Element, EventElemType extends Element, EventMap> = OurElemType extends EventElemType ? { [K in keyof EventMap]?: (this: EventElemType, event: EventMap[K]) => any } : {};
 
-interface SetupOptions<ElemType extends Element> {
-    style?: Partial<ExlcudeFunctionProps<ExcludeReadonlyProps<CSSStyleDeclaration>>> & {
-        vars?: Record<`--${string}`, string>,
-    },
-    attrs?: Record<string, string>,
-    dataset?: Record<string, string>,
+type SetupOptions<ElemType extends Element> = {
+    style?: Partial<ExcludeFunctionProps<ExcludeReadonlyProps<CSSStyleDeclaration>>> & {
+        vars?: Record<`--${string}`, string>;
+    };
+    attrs?: Record<string, string>;
+    dataset?: Record<string, string>;
     events?: {
         [K in keyof ElementEventMap]?: (this: Element, event: ElementEventMap[K]) => any;
     } & {
@@ -24,12 +24,13 @@ interface SetupOptions<ElemType extends Element> {
     } & SetupOptionsEventHelper<ElemType, HTMLElement, HTMLElementEventMap>
       & SetupOptionsEventHelper<ElemType, HTMLBodyElement, HTMLBodyElementEventMap>
       & SetupOptionsEventHelper<ElemType, HTMLMediaElement, HTMLMediaElementEventMap>
-      & SetupOptionsEventHelper<ElemType, HTMLVideoElement, HTMLVideoElementEventMap>,
-    classList?: Iterable<string>,
-    children?: Iterable<Node>,
-    parent?: Element | null,
-    insertBefore?: Node,
-};
+      & SetupOptionsEventHelper<ElemType, HTMLVideoElement, HTMLVideoElementEventMap>;
+    classList?: Iterable<string>;
+    children?: Iterable<Node>;
+    parent?: Element | null;
+    insertBefore?: Node;
+    [other: string]: unknown;
+} & Partial<ExcludeReadonlyProps<ExcludeFunctionProps<ElemType>>>;
 
 
 export function setup<Elem extends Element>(elem: Elem, {style:{vars:styleVars={}, ...style}={}, attrs={}, dataset={}, events={}, classList=[], children=[], parent=null, insertBefore=null, ...props}: SetupOptions<Elem>): Elem {
