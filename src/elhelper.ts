@@ -1,18 +1,23 @@
 
 
+/** true if X is exactly equal to Y, false otherwise */
 type TypeEquals<X, Y> = (<T>()=>T extends X ? 1 : 2) extends (<T>()=>T extends Y ? 1 : 2) ? true : false;
 
+/** union of all keys of T, except the ones that correspond to readonly properties */
 type ExcludeReadonlyPropKeys<T> = { [K in keyof T]: TypeEquals<Pick<T, K>, Readonly<Pick<T, K>>> extends true ? never : K }[keyof T];
-type ExcludeReadonlyProps<T> = Pick<T, ExcludeReadonlyPropKeys<T>>;
 
+/** union of all keys of T, except the ones that correspond to either methods or function properties */
 type ExcludeFunctionPropKeys<T> = { [K in keyof T]: T[K] extends (...args: any) => any ? never : K }[keyof T];
-type ExcludeFunctionProps<T> = Pick<T, ExcludeFunctionPropKeys<T>>;
 
-
+/** gives a { event name -> event listener function type } map from EventMap, but only if OurElemType extends EventElemType */
 type SetupOptionsEventHelper<OurElemType extends Element, EventElemType extends Element, EventMap> = OurElemType extends EventElemType ? { [K in keyof EventMap]?: (this: EventElemType, event: EventMap[K]) => any } : {};
 
-type SetupOptions<ElemType extends Element> = {
-    style?: Partial<ExcludeFunctionProps<ExcludeReadonlyProps<CSSStyleDeclaration>>> & {
+/** T, but without any nullable properties, methods, or function properties, and with all of its properties optional */
+// TODO should probably give this a better name
+type Thing<T> = Partial<Pick<T, ExcludeFunctionPropKeys<T> & ExcludeReadonlyPropKeys<T>>>;
+
+export type SetupOptions<ElemType extends Element> = {
+    style?: Thing<CSSStyleDeclaration> & {
         vars?: Record<`--${string}`, string>;
     };
     attrs?: Record<string, string>;
@@ -30,7 +35,7 @@ type SetupOptions<ElemType extends Element> = {
     parent?: Element | null;
     insertBefore?: Node;
     [other: string]: unknown;
-} & Partial<ExcludeReadonlyProps<ExcludeFunctionProps<ElemType>>>;
+} & Thing<ElemType>;
 
 
 export function setup<Elem extends Element>(elem: Elem, {style:{vars:styleVars={}, ...style}={}, attrs={}, dataset={}, events={}, classList=[], children=[], parent=null, insertBefore=null, ...props}: SetupOptions<Elem>): Elem {
